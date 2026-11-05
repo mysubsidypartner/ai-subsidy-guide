@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="会社名や代表者名などを入力するだけで、IPAのひな形をもとにした「情報セキュリティ基本方針」をPDFで作成できます。SECURITY ACTION 二つ星の準備に。">
+<title>情報セキュリティ基本方針メーカー</title>
+</head>
+<body>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Noto+Serif+JP:wght@400;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: two columns on desktop — form on the left, live A4 sheet on the right (sticky); stacked on phones */
+:root{
+  --bg:#f3f5f4; --surface:#ffffff; --ink:#18242f; --muted:#5c6b74; --line:#d9e0dd;
+  --accent:#1f6b58; --accent-soft:#e1efe9; --neg:#a13a3a;
+  --paper:#ffffff; --paper-ink:#1c1c1c; --paper-rule:#b9c2bf; --paper-shadow:rgba(20,30,35,.14);
+  --f-body:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;
+  --f-doc:"Noto Serif JP","Hiragino Mincho ProN","Yu Mincho",serif;
+  --f-num:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#11181d; --surface:#18222a; --ink:#e4ebe8; --muted:#97a6ad; --line:#2b3a42;
+  --accent:#5fc3a5; --accent-soft:#1c3530; --neg:#ec8a8a; --paper-shadow:rgba(0,0,0,.5); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11181d; --surface:#18222a; --ink:#e4ebe8; --muted:#97a6ad; --line:#2b3a42;
+  --accent:#5fc3a5; --accent-soft:#1c3530; --neg:#ec8a8a; --paper-shadow:rgba(0,0,0,.5); color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.7;margin:0}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
+header h1{font-size:clamp(22px,4vw,30px);font-weight:900;margin:4px 0 6px;text-wrap:balance}
+.eyebrow{font-size:12px;letter-spacing:.12em;color:var(--accent);font-weight:700}
+.lead{color:var(--muted);margin:0 0 10px;max-width:68ch}
+.links{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:13px}
+a{color:var(--accent)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:32px;margin-top:24px;align-items:start}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+
+form{display:flex;flex-direction:column;gap:18px}
+fieldset{border:0;padding:0;margin:0;display:flex;flex-direction:column;gap:12px}
+legend{font-weight:700;font-size:14px;letter-spacing:.06em;color:var(--accent);margin-bottom:8px;padding:0}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:520px){.row{grid-template-columns:1fr}}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:500;min-width:0}
+label.f small{color:var(--muted);font-weight:400}
+input,select,textarea{font:inherit;font-size:14px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:8px 10px;width:100%}
+textarea{resize:vertical;min-height:4.6em;line-height:1.6}
+input:focus-visible,select:focus-visible,textarea:focus-visible,.btn:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.sec{border:1px solid var(--line);border-radius:8px;padding:12px;background:var(--surface);display:flex;flex-direction:column;gap:8px}
+.sec-head{display:flex;gap:8px;align-items:center}
+.sec-head .n{font-family:var(--f-num);color:var(--muted);width:1.6em;flex:none}
+.sec-head input{font-weight:700}
+.mini{font:inherit;font-size:12px;border:0;background:none;color:var(--muted);cursor:pointer;padding:4px 6px;border-radius:4px;flex:none}
+.mini:hover{color:var(--neg)}
+.mini.rv:hover{color:var(--accent)}
+.btn{font:inherit;font-size:14px;font-weight:700;border:1px solid var(--accent);background:var(--accent);color:var(--surface);padding:9px 16px;border-radius:6px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn[disabled]{opacity:.55;cursor:progress}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.msg{font-size:13px;min-height:1.4em;color:var(--accent)}
+.msg.err{color:var(--neg)}
+.hint{font-size:13px;background:var(--accent-soft);border-radius:8px;padding:10px 12px}
+.hint b{font-family:var(--f-num)}
+
+.preview{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px)}
+.preview-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.preview-head span{font-size:13px;color:var(--muted)}
+.sheet-frame{container-type:inline-size;width:100%}
+/* The A4 sheet: every size in cqw so the PDF render at 794px matches the preview exactly */
+.paper{background:var(--paper);color:var(--paper-ink);font-family:var(--f-doc);width:100%;min-height:141.4cqw;padding:12cqw 11cqw 10cqw;box-shadow:0 1px 2px var(--paper-shadow),0 8px 28px var(--paper-shadow);font-size:1.95cqw;line-height:1.9}
+.paper h2{font-size:3.4cqw;text-align:center;font-weight:700;letter-spacing:.3em;margin:0 0 6cqw;padding-bottom:2cqw;border-bottom:.15cqw solid var(--paper-rule)}
+.paper .pre{margin:0 0 4.2cqw;text-indent:1em}
+.paper ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:3cqw}
+.paper li h3{font-size:2.15cqw;font-weight:700;margin:0 0 .6cqw}
+.paper li p{margin:0;padding-left:1em}
+.paper .sign{margin-top:7cqw;text-align:right;line-height:1.8}
+.paper .contact{margin-top:5cqw;font-size:1.7cqw;border-top:.12cqw solid var(--paper-rule);padding-top:2cqw}
+.render-host{position:fixed;left:-10000px;top:0;width:794px}
+.render-host .paper{box-shadow:none}
+footer{margin-top:36px;font-size:12px;color:var(--muted);max-width:80ch}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">SECURITY ACTION 二つ星 ／ 事前準備②</div>
+    <h1>情報セキュリティ基本方針メーカー</h1>
+    <p class="lead">会社名や代表者名など、自社に合わせて変える項目を入力すると、右の基本方針にそのまま反映されます。できあがったらPDFで保存し、ホームページや会社案内に掲載してください。</p>
+    <div class="links">
+      <a href="https://www.ipa.go.jp/security/guide/sme/ug65p90000019cbk-att/sme_guideline_v4.0_app_2.docx" target="_blank" rel="noopener">IPA公式のひな形（Word）</a>
+      <a href="https://www.ipa.go.jp/security/security-action/twostar/" target="_blank" rel="noopener">IPA「二つ星を宣言する」</a>
+      <a href="https://sme-security.ipa.go.jp/" target="_blank" rel="noopener">SECURITY ACTION 申込サイト</a>
+    </div>
+  </header>
+
+  <div class="grid">
+    <form id="form" autocomplete="off">
+      <fieldset>
+        <legend>会社の情報</legend>
+        <div class="row">
+          <label class="f">会社名<input id="company" value="株式会社サンプル商事"><small>入力例です。自社名に書き換えてください</small></label>
+          <label class="f">本文での呼び方<input id="abbr" value="当社"><small>「当社」「弊社」など</small></label>
+        </div>
+        <label class="f">守る情報資産の範囲
+          <select id="scope">
+            <option value="お客様からお預かりした情報資産および当社の情報資産">お客様からお預かりした情報と自社の情報（両方）</option>
+            <option value="お客様からお預かりした情報資産">お客様からお預かりした情報</option>
+            <option value="当社の情報資産">自社の情報</option>
+          </select>
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend>本文</legend>
+        <label class="f">前文<textarea id="pre" rows="4"></textarea></label>
+        <div id="secs" style="display:flex;flex-direction:column;gap:10px"></div>
+        <div class="bar">
+          <button type="button" class="btn ghost" id="addSec">項目を追加</button>
+          <button type="button" class="mini rv" id="resetText">本文を初期文に戻す</button>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>日付と署名</legend>
+        <div class="row">
+          <label class="f">制定日<input type="date" id="est"></label>
+          <label class="f">改定日<small>改定したときだけ入力</small><input type="date" id="rev"></label>
+        </div>
+        <div class="row">
+          <label class="f">代表者の役職<input id="title" value="代表取締役社長"></label>
+          <label class="f">代表者の氏名<input id="ceo" value="山田 太郎"><small>入力例です</small></label>
+        </div>
+        <label class="f">お問い合わせ窓口<small>任意。空欄なら表示しません</small><input id="contact" placeholder="例）総務部 情報セキュリティ担当　TEL 03-0000-0000"></label>
+      </fieldset>
+
+      <div class="hint" id="hint"></div>
+    </form>
+
+    <aside class="preview" aria-label="プレビュー">
+      <div class="preview-head">
+        <span>プレビュー（A4）</span>
+        <div class="bar">
+          <button type="button" class="btn ghost" id="copyText">本文をコピー</button>
+          <button type="button" class="btn" id="pdf">PDFを保存</button>
+        </div>
+      </div>
+      <div class="msg" id="msg" role="status"></div>
+      <div class="sheet-frame"><div class="paper" id="paper"></div></div>
+    </aside>
+  </div>
+
+  <footer>
+    注意：「個人情報保護方針（プライバシーポリシー）」だけを公開しても、二つ星の基本方針とはみなされません。ISMS（ISO/IEC 27001）の基本方針を公開済みの場合はそちらで代用できます。<br>
+    本ツールは IPA「中小企業の情報セキュリティ対策ガイドライン」付録2（情報セキュリティ基本方針サンプル）の構成を参考にした非公式ツールです。入力内容はこのブラウザ内にのみ保存され、外部には送信されません。
+  </footer>
+</div>
+<div class="render-host" id="host" aria-hidden="true"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const DEF_TITLES=["経営者の責任","社内体制の整備","従業員の取組み","法令及び契約上の要求事項の遵守","違反及び事故への対応"];
+function defPre(a,s){return `${a}は、${s}を、事故・災害・不正行為などのさまざまな脅威から守り、お客様ならびに社会からの信頼にお応えするため、以下の方針に基づき全社で情報セキュリティに取り組みます。`}
+function defBodies(a){return [
+  `${a}は、経営者が主導して、組織的かつ継続的に情報セキュリティの改善・向上に努めます。`,
+  `${a}は、情報セキュリティを維持・改善するための体制を整え、情報セキュリティ対策を社内の正式な規則として定めます。`,
+  `${a}の従業員は、情報セキュリティに必要な知識と技術を身につけ、日々の業務で確実に実践します。`,
+  `${a}は、情報セキュリティに関する法令・規制・規範および契約上の義務を遵守し、お客様の期待に応えます。`,
+  `${a}は、法令や契約への違反、情報セキュリティ事故が発生した場合には適切に対処し、再発防止に努めます。`]}
+
+const KEY="kihon-houshin-v1";
+let st=null;
+try{st=JSON.parse(localStorage.getItem(KEY)||"null")}catch(e){}
+function today(){const d=new Date();return d.toISOString().slice(0,10)}
+if(!st){
+  st={company:"株式会社サンプル商事",abbr:"当社",scope:"お客様からお預かりした情報資産および当社の情報資産",
+      pre:null,preDirty:false,secs:DEF_TITLES.map(t=>({t,b:null,dirty:false,def:true})),
+      est:today(),rev:"",title:"代表取締役社長",ceo:"山田 太郎",contact:""};
+}
+// default sections keep `key` (index into the default bodies) so renaming a heading keeps its auto text
+st.secs.forEach((s,i)=>{if(s.def&&s.key==null)s.key=i});
+function fillDefaults(){
+  const a=st.abbr||"当社";const b=defBodies(a);
+  if(!st.preDirty)st.pre=defPre(a,st.scope);
+  st.secs.forEach(s=>{if(!s.dirty&&s.key!=null)s.b=b[s.key]});
+}
+fillDefaults();
+
+["company","abbr","scope","est","rev","title","ceo","contact"].forEach(k=>{$(k).value=st[k]??""});
+$("pre").value=st.pre;
+
+function renderSecs(){
+  const box=$("secs");box.innerHTML="";
+  st.secs.forEach((s,i)=>{
+    const d=document.createElement("div");d.className="sec";
+    d.innerHTML=`<div class="sec-head"><span class="n">${i+1}.</span><input id="st${i}" aria-label="項目${i+1}の見出し"><button type="button" class="mini" data-del="${i}" aria-label="項目${i+1}を削除">削除</button></div><textarea id="sb${i}" rows="3" aria-label="項目${i+1}の本文"></textarea>`;
+    box.appendChild(d);
+    d.querySelector("input").value=s.t;d.querySelector("textarea").value=s.b||"";
+  });
+}
+renderSecs();
+
+$("form").addEventListener("input",e=>{
+  const id=e.target.id;
+  if(/^st\d+$/.test(id)){st.secs[+id.slice(2)].t=e.target.value}
+  else if(/^sb\d+$/.test(id)){const s=st.secs[+id.slice(2)];s.b=e.target.value;s.dirty=true}
+  else if(id==="pre"){st.pre=e.target.value;st.preDirty=true}
+  else if(id in st){st[id]=e.target.value;
+    if(id==="abbr"||id==="scope"){fillDefaults();$("pre").value=st.pre;st.secs.forEach((s,i)=>{const t=$("sb"+i);if(t&&!s.dirty)t.value=s.b})}}
+  persist();draw();
+});
+$("form").addEventListener("change",e=>{if(e.target.id==="scope"){st.scope=e.target.value;fillDefaults();$("pre").value=st.pre;persist();draw()}});
+$("form").addEventListener("submit",e=>e.preventDefault());
+$("secs").addEventListener("click",e=>{
+  const i=e.target.dataset.del;if(i==null)return;
+  st.secs.splice(+i,1);renderSecs();persist();draw();
+});
+$("addSec").onclick=()=>{st.secs.push({t:"新しい項目",b:`${st.abbr||"当社"}は、`,dirty:true});renderSecs();persist();draw();$("st"+(st.secs.length-1)).select()};
+let armed=false;
+$("resetText").onclick=()=>{
+  if(!armed){armed=true;$("resetText").textContent="もう一度押すと前文と項目を初期状態に戻します";setTimeout(()=>{armed=false;$("resetText").textContent="本文を初期文に戻す"},3500);return}
+  armed=false;$("resetText").textContent="本文を初期文に戻す";
+  st.preDirty=false;st.secs=DEF_TITLES.map((t,key)=>({t,b:null,dirty:false,def:true,key}));
+  fillDefaults();$("pre").value=st.pre;renderSecs();persist();draw();
+};
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}}
+
+function jdate(v){if(!v)return"";const[y,m,d]=v.split("-").map(Number);return `${y}年${m}月${d}日`}
+function esc(s){return String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])).replace(/\n/g,"<br>")}
+function sheetHTML(){
+  return `<h2>情報セキュリティ基本方針</h2>
+  <p class="pre">${esc(st.pre)}</p>
+  <ol>${st.secs.map((s,i)=>`<li><h3>${i+1}. ${esc(s.t)}</h3><p>${esc(s.b)}</p></li>`).join("")}</ol>
+  <div class="sign">${st.est?`制定日：${jdate(st.est)}<br>`:""}${st.rev?`改定日：${jdate(st.rev)}<br>`:""}${esc(st.company)}<br>${esc(st.title)}　${esc(st.ceo)}</div>
+  ${st.contact?`<div class="contact">お問い合わせ先：${esc(st.contact)}</div>`:""}`;
+}
+function draw(){
+  $("paper").innerHTML=sheetHTML();
+  const ym=(st.est||today()).slice(0,7).replace("-","/");
+  $("hint").innerHTML=`公開したら、申込画面の「基本方針 公開時期」に公開した年月を <b>YYYY/MM</b> 形式で入力します（制定と同じ月に公開した場合は <b>${ym}</b>）。「基本方針 公開方法」はプルダウンから選択します。`;
+}
+draw();
+
+function plainText(){
+  return ["情報セキュリティ基本方針","",st.pre,"",...st.secs.flatMap((s,i)=>[`${i+1}. ${s.t}`,s.b,""]),
+    st.est?`制定日：${jdate(st.est)}`:"",st.rev?`改定日：${jdate(st.rev)}`:"",st.company,`${st.title}　${st.ceo}`,st.contact?`お問い合わせ先：${st.contact}`:""].filter((l,i,a)=>!(l===""&&a[i-1]==="")).join("\n").trim();
+}
+function say(m,err){const el=$("msg");el.textContent=m;el.classList.toggle("err",!!err);clearTimeout(say.t);say.t=setTimeout(()=>el.textContent="",6000)}
+$("copyText").onclick=async()=>{
+  try{await navigator.clipboard.writeText(plainText());say("本文をコピーしました。ホームページへの掲載にお使いください。")}
+  catch(e){const r=document.createRange();r.selectNodeContents($("paper"));const s=getSelection();s.removeAllRanges();s.addRange(r);say("プレビューの文章を選択しました。コピーしてお使いください。")}
+};
+
+
+$("pdf").onclick=async()=>{
+  const btn=$("pdf");
+  if(!window.html2canvas||!window.jspdf){say("PDF作成の準備ができていません。ページを再読み込みしてください。",true);return}
+  btn.disabled=true;btn.textContent="作成中…";
+  try{
+    await document.fonts.ready;
+    const host=$("host");host.innerHTML=`<div class="sheet-frame"><div class="paper">${sheetHTML()}</div></div>`;
+    const node=host.querySelector(".paper");
+    const canvas=await html2canvas(node,{scale:2,backgroundColor:"#ffffff",useCORS:true});
+    host.innerHTML="";
+    const {jsPDF}=window.jspdf;const pdf=new jsPDF({unit:"mm",format:"a4",orientation:"portrait"});
+    const pageHpx=Math.floor(canvas.width*297/210);
+    for(let y=0,p=0;y<canvas.height;y+=pageHpx,p++){
+      const h=Math.min(pageHpx,canvas.height-y);
+      const c=document.createElement("canvas");c.width=canvas.width;c.height=pageHpx;
+      const g=c.getContext("2d");g.fillStyle="#ffffff";g.fillRect(0,0,c.width,c.height);g.drawImage(canvas,0,y,canvas.width,h,0,0,canvas.width,h);
+      if(p)pdf.addPage();
+      pdf.addImage(c.toDataURL("image/jpeg",0.95),"JPEG",0,0,210,297);
+    }
+    pdf.setProperties({title:"情報セキュリティ基本方針",subject:st.company});
+    const name=`情報セキュリティ基本方針_${(st.company||"").replace(/[\\/:*?"<>|]/g,"").trim()||"自社"}.pdf`;
+    pdf.save(name);
+    say("PDFを保存しました。");
+  }catch(e){
+    const c=e&&e.code;
+    say("PDFを保存できませんでした。もう一度お試しいただくか、「本文をコピー」をお使いください。",true);
+  }finally{btn.disabled=false;btn.textContent="PDFを保存"}
+};
+</script>
+</body>
+</html>
