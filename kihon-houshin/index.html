@@ -263,8 +263,14 @@ $("pdf").onclick=async()=>{
     host.innerHTML="";
     const {jsPDF}=window.jspdf;const pdf=new jsPDF({unit:"mm",format:"a4",orientation:"portrait"});
     const pageHpx=Math.floor(canvas.width*297/210);
-    for(let y=0,p=0;y<canvas.height;y+=pageHpx,p++){
+    const blank=(y,h)=>{const d=canvas.getContext("2d").getImageData(0,y,canvas.width,h).data;for(let i=0;i<d.length;i+=16)if(d[i]<245||d[i+1]<245||d[i+2]<245)return false;return true};
+    if(canvas.height<=pageHpx*1.05){
+      // 1ページをわずかに超えるだけなら、縮小して1ページに収める（白紙の2枚目を出さない）
+      const s=Math.min(1,pageHpx/canvas.height),w=210*s;
+      pdf.addImage(canvas.toDataURL("image/jpeg",0.95),"JPEG",(210-w)/2,0,w,w*canvas.height/canvas.width);
+    }else for(let y=0,p=0;y<canvas.height;y+=pageHpx,p++){
       const h=Math.min(pageHpx,canvas.height-y);
+      if(p&&blank(y,h))break;
       const c=document.createElement("canvas");c.width=canvas.width;c.height=pageHpx;
       const g=c.getContext("2d");g.fillStyle="#ffffff";g.fillRect(0,0,c.width,c.height);g.drawImage(canvas,0,y,canvas.width,h,0,0,canvas.width,h);
       if(p)pdf.addPage();
